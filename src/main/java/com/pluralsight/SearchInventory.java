@@ -1,6 +1,12 @@
 package com.pluralsight;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class SearchInventory {
     public static void main(String[] args) {
@@ -15,12 +21,25 @@ public class SearchInventory {
     public static ArrayList<Product> getInventory() {
         ArrayList<Product> inventory = new ArrayList<>();
 
-        inventory.add(new Product(123, "Pasta", 2.99));
-        inventory.add(new Product(124, "Potato", 0.99));
-        inventory.add(new Product(125, "Bag of Rice", 3.99));
-        inventory.add(new Product(126, "1 lb Strawberries", 2.79));
-        inventory.add(new Product(127, "Gallon of Milk", 4.99));
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("inventory.csv"));
 
+            String csvLine;
+
+            while((csvLine = reader.readLine()) != null){
+                String[] tokens = csvLine.split("\\|");
+
+                int productId = Integer.parseInt(tokens[0]);
+                String productName = tokens[1];
+                Double productPrice = Double.parseDouble(tokens[2]);
+
+                inventory.add(new Product(productId, productName, productPrice));
+
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Collections.sort(inventory, Comparator.comparing(Product::getName));
 
         return inventory;
     }
